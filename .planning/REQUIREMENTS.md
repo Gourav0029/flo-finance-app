@@ -41,12 +41,14 @@
 - [ ] **ARCH-01**: Configure GoRouter navigation layer
 - [ ] **ARCH-02**: Implement Riverpod state management and Dependency Injection
 
-## v2 Requirements
-
 ### Gamification & Goals
 
-- **GOAL-01**: Establish savings goal threshold
-- **GOAL-02**: No-spend streak day counter
+- [ ] **GOAL-01**: Establish savings goal threshold
+- [ ] **GOAL-02**: No-spend streak day counter
+
+## v2 Requirements
+
+(None yet)
 
 ## Out of Scope
 
@@ -78,10 +80,12 @@
 | COAC-02 | Phase 4 | Pending |
 | COAC-03 | Phase 4 | Pending |
 | COAC-04 | Phase 4 | Pending |
+| GOAL-01 | Phase 5 | Pending |
+| GOAL-02 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 18 total
-- Mapped to phases: 18
+- v1 requirements: 20 total
+- Mapped to phases: 20
 - Unmapped: 0 ✓
 
 ---
