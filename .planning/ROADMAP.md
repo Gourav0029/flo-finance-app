@@ -96,6 +96,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Core Architecture & Data | 3/3 | Complete | 2026-04-02 |
 | 2. Fundamental UI & Routing | 4/4 | Complete | 2026-04-02 |
-| 3. Insights & Visualizations | 0/3 | Not started | - |
+| 3. Insights & Visualizations | 0/2 | In progress | - |
 | 4. Proactive AI Coach | 0/3 | Not started | - |
 | 5. Gamification & Goals | 0/2 | Not started | - |
