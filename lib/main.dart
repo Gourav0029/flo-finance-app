@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'domain/models/transaction_model.dart';
 import 'domain/models/user_profile_model.dart';
+import 'domain/models/challenge_model.dart';
 import 'domain/repositories/transaction_repository.dart';
 import 'infrastructure/hive_transaction_repository.dart';
 import 'core/theme/app_theme.dart';
@@ -17,10 +18,12 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(TransactionAdapter());
   Hive.registerAdapter(UserProfileAdapter());
+  Hive.registerAdapter(ChallengeAdapter());
   
   final transactionsBox = await Hive.openBox<Transaction>('transactionsBox');
   await Hive.openBox<UserProfile>('userProfileBox');
   await Hive.openBox('settingsBox');
+  await Hive.openBox<Challenge>('challengesBox');
 
   runApp(
     ProviderScope(
