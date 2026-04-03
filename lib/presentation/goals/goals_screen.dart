@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/currency_formatter.dart';
 import '../../application/goals_notifier.dart';
 
 class GoalsScreen extends ConsumerWidget {
@@ -95,7 +96,7 @@ class GoalsScreen extends ConsumerWidget {
                           children: [
                             Text('Saved', style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
                             Text(
-                              '₹${goalsState.savingsSaved.toStringAsFixed(0)}',
+                              CurrencyFormatter.formatINR(goalsState.savingsSaved),
                               style: TextStyle(color: theme.primary, fontSize: 24, fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -105,7 +106,7 @@ class GoalsScreen extends ConsumerWidget {
                           children: [
                             Text('Target', style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
                             Text(
-                              '₹${goalsState.savingsTarget.toStringAsFixed(0)}',
+                              CurrencyFormatter.formatINR(goalsState.savingsTarget),
                               style: TextStyle(color: theme.primary, fontSize: 24, fontWeight: FontWeight.bold),
                             ),
                           ],

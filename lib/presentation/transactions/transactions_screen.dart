@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/currency_formatter.dart';
 import '../../application/transactions_list_notifier.dart';
+import 'widgets/transaction_icon.dart';
+import 'widgets/add_transaction_bottom_sheet.dart';
+
 class TransactionsScreen extends ConsumerWidget {
   const TransactionsScreen({super.key});
 
@@ -67,70 +71,87 @@ class TransactionsScreen extends ConsumerWidget {
                     final tx = transactions[index];
                     final isExpense = tx.amount < 0;
                     final displayAmount = isExpense 
-                        ? '- ₹ ${(-tx.amount).toStringAsFixed(0)}' 
-                        : '+ ₹ ${tx.amount.toStringAsFixed(0)}';
+                        ? '- ${CurrencyFormatter.formatINR(-tx.amount)}' 
+                        : '+ ${CurrencyFormatter.formatINR(tx.amount)}';
                         
-                    IconData catIcon = Icons.help_outline;
-                    if (tx.category == 'Food') catIcon = Icons.fastfood;
-                    if (tx.category == 'Transport') catIcon = Icons.directions_car;
-                    if (tx.category == 'Utilities') catIcon = Icons.bolt;
-                    
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: GestureDetector(
-                        onLongPress: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Delete Transaction'),
-                              content: const Text('Are you sure you want to delete this transaction?'),
-                              actions: [
-                                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-                                TextButton(
-                                  onPressed: () {
-                                    ref.read(transactionsListNotifierProvider.notifier).deleteTransaction(tx.id);
-                                    Navigator.pop(context);
-                                  }, 
-                                  child: const Text('Delete', style: TextStyle(color: Colors.red)),
-                                ),
-                              ],
-                            )
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundColor: theme.background,
-                                    child: Icon(catIcon, color: theme.secondary),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(tx.category, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                      Text(tx.notes.isEmpty ? DateFormat('MMM dd, yyyy').format(tx.date) : tx.notes, style: const TextStyle(color: Colors.grey, fontSize: 14)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                displayAmount,
-                                style: TextStyle(
-                                  color: isExpense ? Colors.red.shade700 : Colors.green.shade700,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
+                    return Dismissible(
+                      key: Key(tx.id),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        margin: const EdgeInsets.only(bottom: 16.0),
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade400,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
+                      confirmDismiss: (direction) async {
+                        return await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Delete this transaction?'),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            actions: [
+                              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context, true);
+                                }, 
+                                child: const Text('Delete', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
                               ),
                             ],
+                          )
+                        );
+                      },
+                      onDismissed: (direction) {
+                        ref.read(transactionsListNotifierProvider.notifier).deleteTransaction(tx.id);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: GestureDetector(
+                          onLongPress: () {
+                            showModalBottomSheet(
+                              context: context, 
+                              isScrollControlled: true, 
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => AddTransactionBottomSheet(existingTx: tx)
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 4))],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    TransactionIcon(category: tx.category),
+                                    const SizedBox(width: 16),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(tx.category, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                        Text(tx.notes.isEmpty ? DateFormat('MMM dd, yyyy').format(tx.date) : tx.notes, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  displayAmount,
+                                  style: TextStyle(
+                                    color: isExpense ? Colors.red.shade700 : Colors.green.shade700,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

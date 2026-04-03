@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
+import '../domain/models/user_profile_model.dart';
 import '../core/theme/app_theme.dart';
 import '../presentation/widgets/glass_nav.dart';
 import '../presentation/widgets/ai_coach_fab.dart';
@@ -10,11 +12,19 @@ import '../presentation/transactions/transactions_screen.dart';
 import '../presentation/transactions/widgets/add_transaction_bottom_sheet.dart';
 import '../presentation/insights/insights_screen.dart';
 import '../presentation/goals/goals_screen.dart';
+import '../presentation/onboarding/welcome_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
+  final userProfileBox = Hive.box<UserProfile>('userProfileBox');
+  final isFirstLaunch = userProfileBox.isEmpty;
+
   return GoRouter(
-    initialLocation: '/home',
+    initialLocation: isFirstLaunch ? '/welcome' : '/home',
     routes: [
+      GoRoute(
+        path: '/welcome',
+        builder: (context, state) => const WelcomeScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           final theme = Theme.of(context).extension<AppTheme>()!;

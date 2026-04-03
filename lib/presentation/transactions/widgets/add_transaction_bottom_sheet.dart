@@ -10,17 +10,53 @@ import '../../../../domain/repositories/transaction_repository.dart';
 import '../../../../domain/models/transaction_model.dart';
 import 'package:uuid/uuid.dart';
 
-class AddTransactionBottomSheet extends ConsumerWidget {
-  const AddTransactionBottomSheet({super.key});
+class AddTransactionBottomSheet extends ConsumerStatefulWidget {
+  final Transaction? existingTx;
+  const AddTransactionBottomSheet({super.key, this.existingTx});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AddTransactionBottomSheet> createState() => _AddTransactionBottomSheetState();
+}
+
+class _AddTransactionBottomSheetState extends ConsumerState<AddTransactionBottomSheet> {
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existingTx != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final tx = widget.existingTx!;
+        ref.read(transactionFormNotifierProvider.notifier).updateIsIncome(tx.amount > 0);
+        ref.read(transactionFormNotifierProvider.notifier).updateAmount(tx.amount.abs().toString());
+        ref.read(transactionFormNotifierProvider.notifier).updateCategory(tx.category);
+        ref.read(transactionFormNotifierProvider.notifier).updateDate(tx.date);
+        ref.read(transactionFormNotifierProvider.notifier).updateNotes(tx.notes);
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Reset form for new transactions
+        ref.read(transactionFormNotifierProvider.notifier).updateAmount('');
+        ref.read(transactionFormNotifierProvider.notifier).updateNotes('');
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<AppTheme>()!;
     final formState = ref.watch(transactionFormNotifierProvider);
 
     final List<String> categories = formState.isIncome 
         ? ['Income', 'Salary', 'Gift', 'Other'] 
         : ['Food', 'Transport', 'Utilities', 'Shopping', 'Bills', 'Other'];
+
+    if (widget.existingTx != null && formState.amount == null && widget.existingTx!.amount != 0) {
+      // Just waiting for the postFrameCallback
+      return Container(height: 200, color: Colors.white, child: const Center(child: CircularProgressIndicator()));
+    }
+
+    // Default category fallback
+    final safeCategory = categories.contains(formState.category) ? formState.category : categories.first;
 
     return Container(
       padding: EdgeInsets.only(
@@ -30,7 +66,7 @@ class AddTransactionBottomSheet extends ConsumerWidget {
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
+        color: Colors.white.withValues(alpha: 0.95),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SingleChildScrollView(
@@ -42,7 +78,7 @@ class AddTransactionBottomSheet extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Add Transaction',
+                  widget.existingTx != null ? 'Edit Transaction' : 'Add Transaction',
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 IconButton(
@@ -53,7 +89,6 @@ class AddTransactionBottomSheet extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             
-            // Income / Expense Toggle
             Row(
               children: [
                 Expanded(
@@ -81,8 +116,8 @@ class AddTransactionBottomSheet extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             
-            // Amount
-            TextField(
+            TextFormField(
+              initialValue: widget.existingTx != null ? widget.existingTx!.amount.abs().toString() : '',
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
                 hintText: 'Amount (₹)',
@@ -104,9 +139,8 @@ class AddTransactionBottomSheet extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             
-            // Category Dropdown
             DropdownButtonFormField<String>(
-              value: categories.contains(formState.category) ? formState.category : categories.first,
+              value: safeCategory,
               decoration: InputDecoration(
                 filled: true,
                 fillColor: theme.background,
@@ -124,7 +158,6 @@ class AddTransactionBottomSheet extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             
-            // Date Picker Row
             InkWell(
               onTap: () async {
                 final date = await showDatePicker(
@@ -154,8 +187,8 @@ class AddTransactionBottomSheet extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
 
-            // Notes
-            TextField(
+            TextFormField(
+              initialValue: widget.existingTx?.notes ?? '',
               decoration: InputDecoration(
                 hintText: 'Notes',
                 filled: true,
@@ -185,23 +218,27 @@ class AddTransactionBottomSheet extends ConsumerWidget {
                   if (isValid) {
                     final repo = ref.read(transactionRepositoryProvider);
                     
-                    // Format amount: negative if expense
                     double finalAmount = formState.amount!;
                     if (!formState.isIncome) {
                       finalAmount = -finalAmount;
                     }
                     
+                    if (widget.existingTx != null) {
+                      ref.read(transactionsListNotifierProvider.notifier).deleteTransaction(widget.existingTx!.id);
+                    }
+                    
+                    final newId = widget.existingTx?.id ?? const Uuid().v4();
+                    
                     repo.addTransaction(
                       Transaction(
-                        id: const Uuid().v4(),
+                        id: newId,
                         amount: finalAmount,
                         date: formState.date,
-                        category: formState.category,
+                        category: safeCategory,
                         notes: formState.notes,
                       ),
                     );
                     
-                    // Invalidate providers to force UI refresh seamlessly!
                     ref.invalidate(transactionsListNotifierProvider);
                     ref.invalidate(dashboardNotifierProvider);
                     
@@ -215,9 +252,9 @@ class AddTransactionBottomSheet extends ConsumerWidget {
                     );
                   }
                 },
-                child: const Text(
-                  'Save Transaction',
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                child: Text(
+                  widget.existingTx != null ? 'Update Transaction' : 'Save Transaction',
+                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
