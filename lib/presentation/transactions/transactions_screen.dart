@@ -19,9 +19,20 @@ class TransactionsScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: theme.background,
         elevation: 0,
-        title: Text(
-          'Transactions',
-          style: Theme.of(context).textTheme.headlineMedium,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/images/app_icon.png',
+              width: 28,
+              height: 28,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Flo',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ],
         ),
       ),
       body: Column(

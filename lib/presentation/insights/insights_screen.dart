@@ -15,7 +15,18 @@ class InsightsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.background,
       appBar: AppBar(
-        title: const Text('Insights'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/images/app_icon.png',
+              width: 28,
+              height: 28,
+            ),
+            const SizedBox(width: 8),
+            Text('Flo'),
+          ],
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),

@@ -89,10 +89,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     // Logo
                     Row(
                       children: [
-                        const Icon(
-                          Icons.waves_rounded,
-                          color: primaryColor,
-                          size: 40,
+                        Image.asset(
+                          'assets/images/app_icon.png',
+                          width: 48,
+                          height: 48,
                         ),
                         const SizedBox(width: 8),
                         const Text(

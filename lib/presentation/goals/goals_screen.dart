@@ -15,9 +15,20 @@ class GoalsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.background,
       appBar: AppBar(
-        title: Text(
-          'Goals', 
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/images/app_icon.png',
+              width: 28,
+              height: 28,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Flo', 
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)
+            ),
+          ],
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
