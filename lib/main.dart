@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'domain/models/transaction_model.dart';
 import 'domain/repositories/transaction_repository.dart';
@@ -10,6 +11,7 @@ import 'routing/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   
   await Hive.initFlutter();
   Hive.registerAdapter(TransactionAdapter());

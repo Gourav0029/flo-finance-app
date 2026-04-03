@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../core/theme/app_theme.dart';
 import '../../application/dashboard_notifier.dart';
-
+import '../../application/transactions_list_notifier.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -31,24 +31,38 @@ class HomeScreen extends ConsumerWidget {
                   color: theme.primary,
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '₹ 1,45,000',
-                      style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    final txs = ref.watch(transactionsListNotifierProvider);
+                    double income = 0;
+                    double expenses = 0;
+                    
+                    for (var tx in txs) {
+                      if (tx.amount > 0) income += tx.amount;
+                      if (tx.amount < 0) expenses += tx.amount.abs();
+                    }
+                    
+                    final balance = income - expenses;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSummaryColumn('Income', '₹ 2,00,000', theme.accent),
-                        _buildSummaryColumn('Expenses', '₹ 55,000', Colors.white70),
+                        Text(
+                          '₹ ${balance.toStringAsFixed(0)}',
+                          style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildSummaryColumn('Income', '₹ ${income.toStringAsFixed(0)}', theme.accent),
+                            _buildSummaryColumn('Expenses', '₹ ${expenses.toStringAsFixed(0)}', Colors.white70),
+                          ],
+                        ),
                       ],
-                    ),
-                  ],
+                    );
+                  }
                 ),
               ),
               const SizedBox(height: 32),

@@ -7,12 +7,14 @@ class TransactionFormState {
   final String category;
   final DateTime date;
   final String notes;
+  final bool isIncome;
 
   TransactionFormState({
     this.amount,
     this.category = 'Food',
     DateTime? date,
     this.notes = '',
+    this.isIncome = false,
   }) : date = date ?? DateTime.now();
 
   TransactionFormState copyWith({
@@ -20,12 +22,14 @@ class TransactionFormState {
     String? category,
     DateTime? date,
     String? notes,
+    bool? isIncome,
   }) {
     return TransactionFormState(
       amount: amount ?? this.amount,
       category: category ?? this.category,
       date: date ?? this.date,
       notes: notes ?? this.notes,
+      isIncome: isIncome ?? this.isIncome,
     );
   }
 }
@@ -51,6 +55,10 @@ class TransactionFormNotifier extends _$TransactionFormNotifier {
   
   void updateNotes(String notes) {
     state = state.copyWith(notes: notes);
+  }
+
+  void updateIsIncome(bool isIncome) {
+    state = state.copyWith(isIncome: isIncome, category: isIncome ? 'Income' : 'Food');
   }
 
   bool validate() {
