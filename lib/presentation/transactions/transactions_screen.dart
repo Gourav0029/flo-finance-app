@@ -13,6 +13,7 @@ class TransactionsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context).extension<AppTheme>()!;
+    final colorScheme = Theme.of(context).colorScheme;
     
     return Scaffold(
       backgroundColor: theme.background,
@@ -30,7 +31,12 @@ class TransactionsScreen extends ConsumerWidget {
             const SizedBox(width: 8),
             Text(
               'Flo',
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                letterSpacing: -0.5,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ],
         ),
@@ -45,7 +51,7 @@ class TransactionsScreen extends ConsumerWidget {
                   hintText: 'Search transactions...',
                   prefixIcon: const Icon(Icons.search),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: colorScheme.surfaceContainerHighest,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
                     borderSide: BorderSide.none,
@@ -58,13 +64,13 @@ class TransactionsScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
             child: Row(
               children: [
-                _buildFilterChip('All', ref, theme),
+                _buildFilterChip('All', ref, theme, colorScheme),
                 const SizedBox(width: 8),
-                _buildFilterChip('Food', ref, theme),
+                _buildFilterChip('Food', ref, theme, colorScheme),
                 const SizedBox(width: 8),
-                _buildFilterChip('Transport', ref, theme),
+                _buildFilterChip('Transport', ref, theme, colorScheme),
                 const SizedBox(width: 8),
-                _buildFilterChip('Utilities', ref, theme),
+                _buildFilterChip('Utilities', ref, theme, colorScheme),
               ],
             ),
           ),
@@ -73,7 +79,7 @@ class TransactionsScreen extends ConsumerWidget {
               builder: (context, ref, child) {
                 final transactions = ref.watch(transactionsListNotifierProvider);
                 if (transactions.isEmpty) {
-                  return const Center(child: Text('No transactions found.'));
+                  return Center(child: Text('No transactions found.', style: TextStyle(color: colorScheme.onSurfaceVariant)));
                 }
                 return ListView.builder(
                   itemCount: transactions.length,
@@ -103,7 +109,6 @@ class TransactionsScreen extends ConsumerWidget {
                           context: context,
                           builder: (context) => AlertDialog(
                             title: const Text('Delete this transaction?'),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                             actions: [
                               TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
                               TextButton(
@@ -133,9 +138,9 @@ class TransactionsScreen extends ConsumerWidget {
                           child: Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: colorScheme.surfaceContainer,
                               borderRadius: BorderRadius.circular(16),
-                              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 4))],
+                              boxShadow: [BoxShadow(color: colorScheme.shadow.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 4))],
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -147,8 +152,8 @@ class TransactionsScreen extends ConsumerWidget {
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(tx.category, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                        Text(tx.notes.isEmpty ? DateFormat('MMM dd, yyyy').format(tx.date) : tx.notes, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                                        Text(tx.category, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.onSurface)),
+                                        Text(tx.notes.isEmpty ? DateFormat('MMM dd, yyyy').format(tx.date) : tx.notes, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14)),
                                       ],
                                     ),
                                   ],
@@ -177,7 +182,7 @@ class TransactionsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFilterChip(String label, WidgetRef ref, AppTheme theme) {
+  Widget _buildFilterChip(String label, WidgetRef ref, AppTheme theme, ColorScheme colorScheme) {
     final filters = ref.watch(transactionsFilterNotifierProvider);
     final isSelected = filters.selectedCategory == label;
     
@@ -187,10 +192,10 @@ class TransactionsScreen extends ConsumerWidget {
       onSelected: (_) {
         ref.read(transactionsFilterNotifierProvider.notifier).updateCategory(label);
       },
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surfaceContainerHigh,
       selectedColor: theme.accent,
       labelStyle: TextStyle(
-        color: isSelected ? theme.primary : Colors.black87,
+        color: isSelected ? theme.primary : colorScheme.onSurfaceVariant,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),

@@ -13,6 +13,33 @@ import '../presentation/transactions/widgets/add_transaction_bottom_sheet.dart';
 import '../presentation/insights/insights_screen.dart';
 import '../presentation/goals/goals_screen.dart';
 import '../presentation/onboarding/welcome_screen.dart';
+import '../presentation/settings/settings_screen.dart';
+
+CustomTransitionPage<void> _fadeSlideTransition({
+  required Widget child,
+  required LocalKey? key,
+}) {
+  return CustomTransitionPage<void>(
+    key: key,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 300),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(
+        opacity: animation,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.05),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          )),
+          child: child,
+        ),
+      );
+    },
+  );
+}
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final userProfileBox = Hive.box<UserProfile>('userProfileBox');
@@ -23,7 +50,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/welcome',
-        builder: (context, state) => const WelcomeScreen(),
+        pageBuilder: (context, state) => _fadeSlideTransition(
+          key: state.pageKey,
+          child: const WelcomeScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/settings',
+        pageBuilder: (context, state) => _fadeSlideTransition(
+          key: state.pageKey,
+          child: const SettingsScreen(),
+        ),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -69,7 +106,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/home',
-                builder: (context, state) => const HomeScreen(),
+                pageBuilder: (context, state) => _fadeSlideTransition(
+                  key: state.pageKey,
+                  child: const HomeScreen(),
+                ),
               ),
             ],
           ),
@@ -77,7 +117,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/transactions',
-                builder: (context, state) => const TransactionsScreen(),
+                pageBuilder: (context, state) => _fadeSlideTransition(
+                  key: state.pageKey,
+                  child: const TransactionsScreen(),
+                ),
               ),
             ],
           ),
@@ -85,7 +128,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/goals',
-                builder: (context, state) => const GoalsScreen(),
+                pageBuilder: (context, state) => _fadeSlideTransition(
+                  key: state.pageKey,
+                  child: const GoalsScreen(),
+                ),
               ),
             ],
           ),
@@ -93,7 +139,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/insights',
-                builder: (context, state) => const InsightsScreen(),
+                pageBuilder: (context, state) => _fadeSlideTransition(
+                  key: state.pageKey,
+                  child: const InsightsScreen(),
+                ),
               ),
             ],
           ),

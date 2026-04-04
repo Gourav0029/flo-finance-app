@@ -131,12 +131,13 @@ class _AddChallengeBottomSheetState extends ConsumerState<AddChallengeBottomShee
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<AppTheme>()!;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return DefaultTextStyle(
-      style: const TextStyle(fontFamily: 'Inter', color: Colors.black87),
+      style: TextStyle(fontFamily: 'Inter', color: colorScheme.onSurface),
       child: Container(
         decoration: BoxDecoration(
-          color: theme.background,
+          color: colorScheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: EdgeInsets.only(
@@ -158,7 +159,7 @@ class _AddChallengeBottomSheetState extends ConsumerState<AddChallengeBottomShee
                     height: 4,
                     margin: const EdgeInsets.only(bottom: 24),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -177,9 +178,9 @@ class _AddChallengeBottomSheetState extends ConsumerState<AddChallengeBottomShee
                   decoration: InputDecoration(
                     labelText: 'Challenge Name',
                     hintText: 'e.g. No Eating Out',
-                    labelStyle: TextStyle(color: Colors.grey.shade600),
+                    labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                     enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
                     ),
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: theme.secondary, width: 2),
@@ -192,9 +193,9 @@ class _AddChallengeBottomSheetState extends ConsumerState<AddChallengeBottomShee
                   value: _selectedCategory,
                   decoration: InputDecoration(
                     labelText: 'Category Focus',
-                    labelStyle: TextStyle(color: Colors.grey.shade600),
+                    labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                     enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
                     ),
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: theme.secondary, width: 2),
@@ -223,9 +224,9 @@ class _AddChallengeBottomSheetState extends ConsumerState<AddChallengeBottomShee
                     labelText: 'Budget Limit',
                     prefixText: '₹ ',
                     prefixStyle: TextStyle(color: theme.primary, fontWeight: FontWeight.bold, fontSize: 16),
-                    labelStyle: TextStyle(color: Colors.grey.shade600),
+                    labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                     enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
                     ),
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: theme.secondary, width: 2),
@@ -239,16 +240,16 @@ class _AddChallengeBottomSheetState extends ConsumerState<AddChallengeBottomShee
                 ),
                 const SizedBox(height: 32),
                 
-                const Text('Duration', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
+                Text('Duration', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 12,
                   runSpacing: 12,
                   children: [
-                    _buildDurationChip(7, '7 Days', theme),
-                    _buildDurationChip(14, '14 Days', theme),
-                    _buildDurationChip(30, '30 Days', theme),
-                    _buildCustomDurationChip(theme),
+                    _buildDurationChip(7, '7 Days', theme, colorScheme),
+                    _buildDurationChip(14, '14 Days', theme, colorScheme),
+                    _buildDurationChip(30, '30 Days', theme, colorScheme),
+                    _buildCustomDurationChip(theme, colorScheme),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -261,13 +262,13 @@ class _AddChallengeBottomSheetState extends ConsumerState<AddChallengeBottomShee
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
+                            border: Border.all(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Start Date', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                              Text('Start Date', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12)),
                               const SizedBox(height: 4),
                               Text(
                                 DateFormat('dd MMM yyyy').format(_startDate),
@@ -283,20 +284,20 @@ class _AddChallengeBottomSheetState extends ConsumerState<AddChallengeBottomShee
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
+                          color: colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.transparent),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('End Date', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                            Text('End Date', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12)),
                             const SizedBox(height: 4),
                             Text(
                               _durationDays > 0 
                                   ? DateFormat('dd MMM yyyy').format(_startDate.add(Duration(days: _durationDays)))
                                   : (_customEndDate != null ? DateFormat('dd MMM yyyy').format(_customEndDate!) : 'Select...'),
-                              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                              style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant),
                             ),
                           ],
                         ),
@@ -329,7 +330,7 @@ class _AddChallengeBottomSheetState extends ConsumerState<AddChallengeBottomShee
     );
   }
 
-  Widget _buildDurationChip(int days, String label, AppTheme theme) {
+  Widget _buildDurationChip(int days, String label, AppTheme theme, ColorScheme colorScheme) {
     final isSelected = _durationDays == days;
     return InkWell(
       onTap: () {
@@ -342,13 +343,13 @@ class _AddChallengeBottomSheetState extends ConsumerState<AddChallengeBottomShee
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? theme.secondary.withValues(alpha: 0.1) : Colors.transparent,
-          border: Border.all(color: isSelected ? theme.secondary : Colors.grey.shade300),
+          border: Border.all(color: isSelected ? theme.secondary : colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? theme.secondary : Colors.grey.shade600,
+            color: isSelected ? theme.secondary : colorScheme.onSurfaceVariant,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 14,
           ),
@@ -357,7 +358,7 @@ class _AddChallengeBottomSheetState extends ConsumerState<AddChallengeBottomShee
     );
   }
   
-  Widget _buildCustomDurationChip(AppTheme theme) {
+  Widget _buildCustomDurationChip(AppTheme theme, ColorScheme colorScheme) {
     final isSelected = _durationDays == 0;
     return InkWell(
       onTap: _selectCustomEndDate,
@@ -366,13 +367,13 @@ class _AddChallengeBottomSheetState extends ConsumerState<AddChallengeBottomShee
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? theme.secondary.withValues(alpha: 0.1) : Colors.transparent,
-          border: Border.all(color: isSelected ? theme.secondary : Colors.grey.shade300),
+          border: Border.all(color: isSelected ? theme.secondary : colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           'Custom',
           style: TextStyle(
-            color: isSelected ? theme.secondary : Colors.grey.shade600,
+            color: isSelected ? theme.secondary : colorScheme.onSurfaceVariant,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 14,
           ),

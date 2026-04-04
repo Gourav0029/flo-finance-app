@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/models/user_profile_model.dart';
+import '../widgets/profile_picture_sheet.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -35,16 +35,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    try {
-      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-      if (pickedFile != null) {
-        setState(() {
-          _imagePath = pickedFile.path;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error picking image: $e');
+    final result = await showProfilePictureSheet(
+      context,
+      hasExistingPhoto: _imagePath != null,
+    );
+    if (result != null) {
+      setState(() {
+        if (result.removed) {
+          _imagePath = null;
+        } else if (result.path != null) {
+          _imagePath = result.path;
+        }
+      });
     }
   }
 
@@ -67,22 +69,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0xFF1E1B4B);
-    const Color secondaryColor = Color(0xFF006C4B);
+    final theme = Theme.of(context).extension<AppTheme>()!;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
             // Scrollable content
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24.0,
-                  vertical: 40.0,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -95,10 +94,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           height: 48,
                         ),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           'Flo',
                           style: TextStyle(
-                            color: primaryColor,
+                            color: theme.primary,
                             fontSize: 32,
                             fontWeight: FontWeight.w900,
                             letterSpacing: -1,
@@ -108,10 +107,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     ),
                     const SizedBox(height: 40),
 
-                    const Text(
+                    Text(
                       "Welcome!\nLet's get started",
                       style: TextStyle(
-                        color: primaryColor,
+                        color: colorScheme.onSurface,
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         height: 1.2,
@@ -129,7 +128,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             CircleAvatar(
                               radius: 60,
                               backgroundColor: _imagePath == null
-                                  ? secondaryColor.withOpacity(0.1)
+                                  ? theme.secondary.withValues(alpha: 0.1)
                                   : Colors.transparent,
                               backgroundImage: _imagePath != null
                                   ? FileImage(File(_imagePath!))
@@ -138,26 +137,26 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   ? (_isNameValid
                                         ? Text(
                                             _getInitials(),
-                                            style: const TextStyle(
-                                              color: secondaryColor,
+                                            style: TextStyle(
+                                              color: theme.secondary,
                                               fontSize: 40,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           )
-                                        : const Icon(
+                                        : Icon(
                                             Icons.person,
                                             size: 60,
-                                            color: secondaryColor,
+                                            color: theme.secondary,
                                           ))
                                   : null,
                             ),
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: primaryColor,
+                                color: theme.primary,
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.white,
+                                  color: colorScheme.surface,
                                   width: 3,
                                 ),
                               ),
@@ -172,20 +171,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    const Center(
+                    Center(
                       child: Text(
                         'Tap to set a profile picture (optional)',
-                        style: TextStyle(color: Colors.grey, fontSize: 13),
+                        style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
                       ),
                     ),
                     const SizedBox(height: 40),
 
-                    const Text(
+                    Text(
                       'What should we call you?',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -196,7 +195,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       decoration: InputDecoration(
                         hintText: 'Enter your name...',
                         filled: true,
-                        fillColor: Colors.grey.shade100,
+                        fillColor: colorScheme.surfaceContainerHighest,
                         contentPadding: const EdgeInsets.all(20),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -219,8 +218,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _isNameValid
-                        ? primaryColor
-                        : Colors.grey.shade300,
+                        ? theme.primary
+                        : colorScheme.surfaceContainerHigh,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -230,7 +229,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   child: Text(
                     'Get Started',
                     style: TextStyle(
-                      color: _isNameValid ? Colors.white : Colors.grey.shade600,
+                      color: _isNameValid ? Colors.white : colorScheme.onSurfaceVariant,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),

@@ -44,6 +44,7 @@ class _AddTransactionBottomSheetState extends ConsumerState<AddTransactionBottom
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<AppTheme>()!;
+    final colorScheme = Theme.of(context).colorScheme;
     final formState = ref.watch(transactionFormNotifierProvider);
 
     final List<String> categories = formState.isIncome 
@@ -52,7 +53,7 @@ class _AddTransactionBottomSheetState extends ConsumerState<AddTransactionBottom
 
     if (widget.existingTx != null && formState.amount == null && widget.existingTx!.amount != 0) {
       // Just waiting for the postFrameCallback
-      return Container(height: 200, color: Colors.white, child: const Center(child: CircularProgressIndicator()));
+      return Container(height: 200, color: colorScheme.surface, child: const Center(child: CircularProgressIndicator()));
     }
 
     // Default category fallback
@@ -66,7 +67,7 @@ class _AddTransactionBottomSheetState extends ConsumerState<AddTransactionBottom
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.95),
+        color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SingleChildScrollView(
@@ -122,7 +123,7 @@ class _AddTransactionBottomSheetState extends ConsumerState<AddTransactionBottom
               decoration: InputDecoration(
                 hintText: 'Amount (₹)',
                 filled: true,
-                fillColor: theme.background,
+                fillColor: colorScheme.surfaceContainerHighest,
                 prefixText: formState.isIncome ? '+ ' : '- ',
                 prefixStyle: TextStyle(
                   color: formState.isIncome ? Colors.green.shade700 : Colors.red.shade700, 
@@ -143,7 +144,7 @@ class _AddTransactionBottomSheetState extends ConsumerState<AddTransactionBottom
               value: safeCategory,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: theme.background,
+                fillColor: colorScheme.surfaceContainerHighest,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -173,7 +174,7 @@ class _AddTransactionBottomSheetState extends ConsumerState<AddTransactionBottom
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 decoration: BoxDecoration(
-                  color: theme.background,
+                  color: colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
@@ -192,7 +193,7 @@ class _AddTransactionBottomSheetState extends ConsumerState<AddTransactionBottom
               decoration: InputDecoration(
                 hintText: 'Notes',
                 filled: true,
-                fillColor: theme.background,
+                fillColor: colorScheme.surfaceContainerHighest,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,

@@ -14,6 +14,7 @@ class GoalsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context).extension<AppTheme>()!;
+    final colorScheme = Theme.of(context).colorScheme;
     final goalsState = ref.watch(goalsNotifierProvider);
 
     return Scaffold(
@@ -26,9 +27,12 @@ class GoalsScreen extends ConsumerWidget {
             const SizedBox(width: 8),
             Text(
               'Flo',
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                letterSpacing: -0.5,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ],
         ),
@@ -42,7 +46,7 @@ class GoalsScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // No Spend Streak
+              // No Spend Streak — keep gradient as-is
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
@@ -70,19 +74,11 @@ class GoalsScreen extends ConsumerWidget {
                       children: [
                         const Text(
                           'No-Spend Streak',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                         Text(
                           '${goalsState.noSpendStreak} Days',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -92,25 +88,20 @@ class GoalsScreen extends ConsumerWidget {
               const SizedBox(height: 32),
 
               // Active Challenges Summary
-              _buildActiveChallengesSummary(context, ref, theme),
+              _buildActiveChallengesSummary(context, ref, theme, colorScheme),
               const SizedBox(height: 32),
 
               // Savings Goal
-              Text(
-                'Savings Goal',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
+              Text('Savings Goal', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: colorScheme.onSurface)),
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
+                      color: colorScheme.shadow.withValues(alpha: 0.05),
                       blurRadius: 15,
                       offset: const Offset(0, 5),
                     ),
@@ -124,44 +115,20 @@ class GoalsScreen extends ConsumerWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Text('Saved', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14)),
                             Text(
-                              'Saved',
-                              style: TextStyle(
-                                color: Colors.grey.shade600,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              CurrencyFormatter.formatINR(
-                                goalsState.savingsSaved,
-                              ),
-                              style: TextStyle(
-                                color: theme.primary,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              CurrencyFormatter.formatINR(goalsState.savingsSaved),
+                              style: TextStyle(color: theme.primary, fontSize: 24, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
+                            Text('Target', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14)),
                             Text(
-                              'Target',
-                              style: TextStyle(
-                                color: Colors.grey.shade600,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              CurrencyFormatter.formatINR(
-                                goalsState.savingsTarget,
-                              ),
-                              style: TextStyle(
-                                color: theme.primary,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              CurrencyFormatter.formatINR(goalsState.savingsTarget),
+                              style: TextStyle(color: theme.primary, fontSize: 24, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -170,15 +137,12 @@ class GoalsScreen extends ConsumerWidget {
                     const SizedBox(height: 24),
                     LinearProgressIndicator(
                       value: goalsState.savingsTarget > 0
-                          ? (goalsState.savingsSaved / goalsState.savingsTarget)
-                                .clamp(0.0, 1.0)
+                          ? (goalsState.savingsSaved / goalsState.savingsTarget).clamp(0.0, 1.0)
                           : 0,
                       minHeight: 12,
-                      backgroundColor: Colors.grey.shade200,
+                      backgroundColor: colorScheme.surfaceContainerHigh,
                       borderRadius: BorderRadius.circular(12),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        theme.secondary,
-                      ),
+                      valueColor: AlwaysStoppedAnimation<Color>(theme.secondary),
                     ),
                     const SizedBox(height: 24),
                     SizedBox(
@@ -186,21 +150,11 @@ class GoalsScreen extends ConsumerWidget {
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           side: BorderSide(color: theme.secondary),
                         ),
-                        onPressed: () {
-                          _showSetGoalDialog(context, ref, theme);
-                        },
-                        child: Text(
-                          'Set Goal',
-                          style: TextStyle(
-                            color: theme.secondary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        onPressed: () => _showSetGoalDialog(context, ref, theme, colorScheme),
+                        child: Text('Set Goal', style: TextStyle(color: theme.secondary, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
@@ -212,12 +166,7 @@ class GoalsScreen extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Challenges History',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text('Challenges History', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: colorScheme.onSurface)),
                   GestureDetector(
                     onTap: () => showModalBottomSheet(
                       context: context,
@@ -228,7 +177,7 @@ class GoalsScreen extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: theme.secondary.withOpacity(0.1),
+                        color: theme.secondary.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(Icons.add, color: theme.secondary, size: 22),
@@ -237,7 +186,7 @@ class GoalsScreen extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              _buildChallengesHistory(context, ref, theme),
+              _buildChallengesHistory(context, ref, theme, colorScheme),
             ],
           ),
         ),
@@ -245,70 +194,43 @@ class GoalsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActiveChallengesSummary(
-    BuildContext context,
-    WidgetRef ref,
-    AppTheme theme,
-  ) {
+  Widget _buildActiveChallengesSummary(BuildContext context, WidgetRef ref, AppTheme theme, ColorScheme colorScheme) {
     final challengesList = ref.watch(challengesNotifierProvider);
-    final activeChallenges = challengesList
-        .where((c) => c.status == ChallengeStatus.ACTIVE)
-        .toList();
+    final activeChallenges = challengesList.where((c) => c.status == ChallengeStatus.ACTIVE).toList();
 
     if (activeChallenges.isEmpty) {
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: [BoxShadow(color: colorScheme.shadow.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
         ),
         child: Column(
           children: [
-            Icon(Icons.flag_outlined, size: 40, color: Colors.grey.shade400),
+            Icon(Icons.flag_outlined, size: 40, color: colorScheme.onSurfaceVariant),
             const SizedBox(height: 12),
-            Text(
-              'No active challenges',
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text('No active challenges', style: TextStyle(color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(
-              'Start a new challenge to track your spending limits.',
+            Text('Start a new challenge to track your spending limits.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+              style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
             ),
           ],
         ),
       );
     }
 
-    final urgent = activeChallenges.reduce(
-      (a, b) => a.challenge.endDate.isBefore(b.challenge.endDate) ? a : b,
-    );
+    final urgent = activeChallenges.reduce((a, b) => a.challenge.endDate.isBefore(b.challenge.endDate) ? a : b);
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: colorScheme.shadow.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -316,72 +238,37 @@ class GoalsScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Active Challenges',
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-              ),
+              Text('Active Challenges', style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 14)),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: theme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '${activeChallenges.length} Active',
-                  style: TextStyle(
-                    color: theme.primary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: theme.primary, fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Ending Soonest:',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
+          Text('Ending Soonest:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: colorScheme.onSurface)),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text(
-                  urgent.challenge.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
+                child: Text(urgent.challenge.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.onSurface), overflow: TextOverflow.ellipsis),
               ),
-              Text(
-                '${urgent.challenge.endDate.difference(DateTime.now()).inDays} days left',
-                style: TextStyle(
-                  color: theme.secondary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text('${urgent.challenge.endDate.difference(DateTime.now()).inDays} days left', style: TextStyle(color: theme.secondary, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 12),
           LinearProgressIndicator(
-            value: urgent.challenge.budgetLimit > 0
-                ? (urgent.currentSpent / urgent.challenge.budgetLimit).clamp(
-                    0.0,
-                    1.0,
-                  )
-                : 0,
-            backgroundColor: Colors.grey.shade200,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              urgent.currentSpent > urgent.challenge.budgetLimit
-                  ? Colors.red
-                  : theme.secondary,
-            ),
+            value: urgent.challenge.budgetLimit > 0 ? (urgent.currentSpent / urgent.challenge.budgetLimit).clamp(0.0, 1.0) : 0,
+            backgroundColor: colorScheme.surfaceContainerHigh,
+            valueColor: AlwaysStoppedAnimation<Color>(urgent.currentSpent > urgent.challenge.budgetLimit ? Colors.red : theme.secondary),
             minHeight: 8,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -389,14 +276,8 @@ class GoalsScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                CurrencyFormatter.formatINR(urgent.currentSpent),
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-              ),
-              Text(
-                CurrencyFormatter.formatINR(urgent.challenge.budgetLimit),
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-              ),
+              Text(CurrencyFormatter.formatINR(urgent.currentSpent), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12)),
+              Text(CurrencyFormatter.formatINR(urgent.challenge.budgetLimit), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12)),
             ],
           ),
         ],
@@ -404,11 +285,7 @@ class GoalsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildChallengesHistory(
-    BuildContext context,
-    WidgetRef ref,
-    AppTheme theme,
-  ) {
+  Widget _buildChallengesHistory(BuildContext context, WidgetRef ref, AppTheme theme, ColorScheme colorScheme) {
     final challengesList = ref.watch(challengesNotifierProvider);
 
     if (challengesList.isEmpty) {
@@ -417,15 +294,9 @@ class GoalsScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(32.0),
           child: Column(
             children: [
-              Icon(Icons.sports_score, size: 60, color: Colors.grey.shade300),
+              Icon(Icons.sports_score, size: 60, color: colorScheme.onSurfaceVariant),
               const SizedBox(height: 16),
-              Text(
-                'No challenges yet. Start one!',
-                style: TextStyle(
-                  color: Colors.grey.shade500,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text('No challenges yet. Start one!', style: TextStyle(color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -456,32 +327,21 @@ class GoalsScreen extends ConsumerWidget {
           direction: DismissDirection.endToStart,
           background: Container(
             margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.circular(16),
-            ),
+            decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(16)),
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 24),
             child: const Icon(Icons.delete, color: Colors.white),
           ),
           onDismissed: (_) {
-            ref
-                .read(challengesNotifierProvider.notifier)
-                .deleteChallenge(c.challenge.id);
+            ref.read(challengesNotifierProvider.notifier).deleteChallenge(c.challenge.id);
           },
           child: Container(
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              boxShadow: [BoxShadow(color: colorScheme.shadow.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -494,50 +354,25 @@ class GoalsScreen extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            c.challenge.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
+                          Text(c.challenge.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.onSurface)),
                           Text(
                             '${DateFormat('dd MMM').format(c.challenge.startDate)} - ${DateFormat('dd MMM').format(c.challenge.endDate)}',
-                            style: TextStyle(
-                              color: Colors.grey.shade500,
-                              fontSize: 12,
-                            ),
+                            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
                           ),
                         ],
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: badgeColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         children: [
-                          if (c.status == ChallengeStatus.COMPLETED)
-                            Icon(badgeIcon, size: 14, color: badgeColor)
-                          else
-                            const SizedBox(),
-                          if (c.status == ChallengeStatus.COMPLETED)
-                            const SizedBox(width: 4)
-                          else
-                            const SizedBox(),
-                          Text(
-                            badgeText,
-                            style: TextStyle(
-                              color: badgeColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            ),
-                          ),
+                          if (c.status == ChallengeStatus.COMPLETED) Icon(badgeIcon, size: 14, color: badgeColor) else const SizedBox(),
+                          if (c.status == ChallengeStatus.COMPLETED) const SizedBox(width: 4) else const SizedBox(),
+                          Text(badgeText, style: TextStyle(color: badgeColor, fontWeight: FontWeight.bold, fontSize: 10)),
                         ],
                       ),
                     ),
@@ -546,18 +381,9 @@ class GoalsScreen extends ConsumerWidget {
                 if (c.status == ChallengeStatus.ACTIVE) ...[
                   const SizedBox(height: 16),
                   LinearProgressIndicator(
-                    value: c.challenge.budgetLimit > 0
-                        ? (c.currentSpent / c.challenge.budgetLimit).clamp(
-                            0.0,
-                            1.0,
-                          )
-                        : 0,
-                    backgroundColor: Colors.grey.shade200,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      c.currentSpent > c.challenge.budgetLimit
-                          ? Colors.red
-                          : theme.secondary,
-                    ),
+                    value: c.challenge.budgetLimit > 0 ? (c.currentSpent / c.challenge.budgetLimit).clamp(0.0, 1.0) : 0,
+                    backgroundColor: colorScheme.surfaceContainerHigh,
+                    valueColor: AlwaysStoppedAnimation<Color>(c.currentSpent > c.challenge.budgetLimit ? Colors.red : theme.secondary),
                     minHeight: 6,
                     borderRadius: BorderRadius.circular(3),
                   ),
@@ -568,20 +394,12 @@ class GoalsScreen extends ConsumerWidget {
                       Text(
                         CurrencyFormatter.formatINR(c.currentSpent),
                         style: TextStyle(
-                          color: c.currentSpent > c.challenge.budgetLimit
-                              ? Colors.red
-                              : Colors.grey.shade700,
+                          color: c.currentSpent > c.challenge.budgetLimit ? Colors.red : colorScheme.onSurfaceVariant,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        CurrencyFormatter.formatINR(c.challenge.budgetLimit),
-                        style: TextStyle(
-                          color: Colors.grey.shade500,
-                          fontSize: 12,
-                        ),
-                      ),
+                      Text(CurrencyFormatter.formatINR(c.challenge.budgetLimit), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12)),
                     ],
                   ),
                 ],
@@ -593,7 +411,7 @@ class GoalsScreen extends ConsumerWidget {
     );
   }
 
-  void _showSetGoalDialog(BuildContext context, WidgetRef ref, AppTheme theme) {
+  void _showSetGoalDialog(BuildContext context, WidgetRef ref, AppTheme theme, ColorScheme colorScheme) {
     final controller = TextEditingController(
       text: ref.read(goalsNotifierProvider).savingsTarget.toStringAsFixed(0),
     );
@@ -602,40 +420,30 @@ class GoalsScreen extends ConsumerWidget {
       builder: (context) {
         return AlertDialog(
           title: const Text('New Target'),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
               hintText: 'Enter amount...',
               filled: true,
-              fillColor: theme.background,
-              border: OutlineInputBorder(
-                borderSide: BorderSide.none,
-                borderRadius: BorderRadius.circular(12),
-              ),
+              fillColor: colorScheme.surfaceContainerHighest,
+              border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(12)),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+              child: Text('Cancel', style: TextStyle(color: colorScheme.onSurfaceVariant)),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: () {
                 final target = double.tryParse(controller.text);
                 if (target != null) {
-                  ref
-                      .read(goalsNotifierProvider.notifier)
-                      .updateSavingsTarget(target);
+                  ref.read(goalsNotifierProvider.notifier).updateSavingsTarget(target);
                 }
                 Navigator.pop(context);
               },
