@@ -14,6 +14,12 @@ import '../presentation/insights/insights_screen.dart';
 import '../presentation/goals/goals_screen.dart';
 import '../presentation/onboarding/welcome_screen.dart';
 import '../presentation/settings/settings_screen.dart';
+import '../presentation/lock/lock_screen.dart';
+
+/// Tracks whether this is the first navigation after cold start.
+class AppState {
+  static bool isFirstLoad = true;
+}
 
 CustomTransitionPage<void> _fadeSlideTransition({
   required Widget child,
@@ -45,14 +51,35 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   final userProfileBox = Hive.box<UserProfile>('userProfileBox');
   final isFirstLaunch = userProfileBox.isEmpty;
 
+  final settingsBox = Hive.box('settingsBox');
+  final biometricEnabled = settingsBox.get('biometricEnabled', defaultValue: false) as bool;
+
+  // Determine initial location
+  String initialLocation;
+  if (isFirstLaunch) {
+    initialLocation = '/welcome';
+  } else if (biometricEnabled && AppState.isFirstLoad) {
+    initialLocation = '/lock';
+    AppState.isFirstLoad = false;
+  } else {
+    initialLocation = '/home';
+  }
+
   return GoRouter(
-    initialLocation: isFirstLaunch ? '/welcome' : '/home',
+    initialLocation: initialLocation,
     routes: [
       GoRoute(
         path: '/welcome',
         pageBuilder: (context, state) => _fadeSlideTransition(
           key: state.pageKey,
           child: const WelcomeScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/lock',
+        pageBuilder: (context, state) => _fadeSlideTransition(
+          key: state.pageKey,
+          child: const LockScreen(),
         ),
       ),
       GoRoute(
@@ -65,7 +92,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           final theme = Theme.of(context).extension<AppTheme>()!;
-          
+
           return Scaffold(
             extendBody: true,
             body: navigationShell,

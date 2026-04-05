@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/security/biometric_service.dart';
 import '../../domain/models/user_profile_model.dart';
 import '../widgets/profile_picture_sheet.dart';
 
@@ -17,6 +18,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   final _nameController = TextEditingController();
   String? _imagePath;
   bool _isNameValid = false;
+  bool _biometricEnabled = false;
+  bool _biometricAvailable = false;
 
   @override
   void initState() {
@@ -26,6 +29,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         _isNameValid = _nameController.text.trim().isNotEmpty;
       });
     });
+    _checkBiometrics();
   }
 
   @override
@@ -57,11 +61,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return name.substring(0, 1).toUpperCase();
   }
 
+  Future<void> _checkBiometrics() async {
+    final available = await BiometricService.isAvailable();
+    if (mounted) {
+      setState(() => _biometricAvailable = available);
+    }
+  }
+
   Future<void> _saveProfileAndContinue() async {
     final name = _nameController.text.trim();
     final profile = UserProfile(name: name, profileImagePath: _imagePath);
     final box = Hive.box<UserProfile>('userProfileBox');
     await box.put('currentUser', profile);
+
+    // Save biometric preference
+    final settingsBox = Hive.box('settingsBox');
+    await settingsBox.put('biometricEnabled', _biometricEnabled);
+
     if (mounted) {
       context.go('/home');
     }
@@ -203,6 +219,54 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 24),
+
+                    // Biometric toggle (only if available)
+                    if (_biometricAvailable)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.shield_outlined, color: theme.secondary, size: 28),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Enable Biometric Lock',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: colorScheme.onSurface,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Protect your data with fingerprint or face unlock',
+                                    style: TextStyle(
+                                      color: colorScheme.onSurfaceVariant,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Switch(
+                              value: _biometricEnabled,
+                              onChanged: (val) => setState(() => _biometricEnabled = val),
+                              activeColor: theme.secondary,
+                            ),
+                          ],
+                        ),
+                      ),
                     const SizedBox(height: 40),
                   ],
                 ),

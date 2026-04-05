@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/security/biometric_service.dart';
 import '../../application/theme_notifier.dart';
 import '../../application/transactions_list_notifier.dart';
 import '../../application/user_profile_notifier.dart';
@@ -123,6 +124,59 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ],
               ),
+            ),
+            const SizedBox(height: 32),
+
+            // Security
+            Text('SECURITY', style: TextStyle(color: theme.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1.5)),
+            const SizedBox(height: 12),
+            FutureBuilder<bool>(
+              future: BiometricService.isAvailable(),
+              builder: (context, snapshot) {
+                final isAvailable = snapshot.data ?? false;
+                final settingsBox = Hive.box('settingsBox');
+                final biometricEnabled = settingsBox.get('biometricEnabled', defaultValue: false) as bool;
+
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: theme.surface,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [BoxShadow(color: colorScheme.shadow.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.fingerprint, color: theme.secondary),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Biometric Lock',
+                              style: TextStyle(fontWeight: FontWeight.w600, color: theme.onBackground),
+                            ),
+                            Text(
+                              isAvailable ? 'Require fingerprint to open app' : 'Not available on this device',
+                              style: TextStyle(color: theme.onSurfaceVariant, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Switch(
+                        value: biometricEnabled,
+                        onChanged: isAvailable
+                            ? (val) async {
+                                await settingsBox.put('biometricEnabled', val);
+                                setState(() {});
+                              }
+                            : null,
+                        activeColor: theme.secondary,
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 32),
 
