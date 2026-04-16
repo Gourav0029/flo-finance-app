@@ -20,6 +20,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   bool _isNameValid = false;
   bool _biometricEnabled = false;
   bool _biometricAvailable = false;
+  bool _smsImportEnabled = false;
 
   @override
   void initState() {
@@ -79,7 +80,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     await settingsBox.put('biometricEnabled', _biometricEnabled);
 
     if (mounted) {
-      context.go('/home');
+      if (_smsImportEnabled) {
+        context.go('/sms-permission');
+      } else {
+        context.go('/home');
+      }
     }
   }
 
@@ -262,6 +267,53 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             Switch(
                               value: _biometricEnabled,
                               onChanged: (val) => setState(() => _biometricEnabled = val),
+                              activeColor: theme.secondary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    // SMS Auto-Import toggle (Android only)
+                    if (Theme.of(context).platform == TargetPlatform.android)
+                      Container(
+                        margin: const EdgeInsets.only(top: 16),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.message, color: theme.secondary, size: 28),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Auto-import bank transactions',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: colorScheme.onSurface,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Read bank SMS to detect transactions. All processing stays on your device.',
+                                    style: TextStyle(
+                                      color: colorScheme.onSurfaceVariant,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Switch(
+                              value: _smsImportEnabled,
+                              onChanged: (val) => setState(() => _smsImportEnabled = val),
                               activeColor: theme.secondary,
                             ),
                           ],

@@ -15,6 +15,8 @@ import '../presentation/goals/goals_screen.dart';
 import '../presentation/onboarding/welcome_screen.dart';
 import '../presentation/settings/settings_screen.dart';
 import '../presentation/lock/lock_screen.dart';
+import '../presentation/sms_import/sms_permission_screen.dart';
+import '../presentation/sms_import/pending_transactions_screen.dart';
 
 /// Tracks whether this is the first navigation after cold start.
 class AppState {
@@ -87,6 +89,20 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => _fadeSlideTransition(
           key: state.pageKey,
           child: const SettingsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/sms-permission',
+        pageBuilder: (context, state) => _fadeSlideTransition(
+          key: state.pageKey,
+          child: const SmsPermissionScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/pending-transactions',
+        pageBuilder: (context, state) => _fadeSlideTransition(
+          key: state.pageKey,
+          child: const PendingTransactionsScreen(),
         ),
       ),
       StatefulShellRoute.indexedStack(

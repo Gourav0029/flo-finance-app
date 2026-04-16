@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
@@ -9,7 +10,9 @@ import '../../core/security/biometric_service.dart';
 import '../../application/theme_notifier.dart';
 import '../../application/transactions_list_notifier.dart';
 import '../../application/user_profile_notifier.dart';
+import '../../application/sms_import_notifier.dart';
 import '../../domain/models/user_profile_model.dart';
+import '../../domain/models/pending_transaction_model.dart';
 import '../widgets/profile_picture_sheet.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -177,6 +180,68 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 );
               },
+            ),
+            const SizedBox(height: 32),
+
+            // Auto-Import
+            Text('AUTO-IMPORT', style: TextStyle(color: theme.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1.5)),
+            const SizedBox(height: 12),
+            Container(
+              decoration: BoxDecoration(
+                color: theme.surface,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [BoxShadow(color: colorScheme.shadow.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
+              ),
+              child: Column(
+                children: [
+                  Builder(
+                    builder: (context) {
+                      final settingsBox = Hive.box('settingsBox');
+                      final smsEnabled = settingsBox.get('smsEnabled', defaultValue: false) as bool;
+                      return ListTile(
+                        leading: Icon(Icons.sms, color: theme.secondary),
+                        title: Text('SMS Auto-Import', style: TextStyle(fontWeight: FontWeight.w600, color: theme.onBackground)),
+                        subtitle: Text('Automatically detect bank transactions', style: TextStyle(color: theme.onSurfaceVariant, fontSize: 12)),
+                        trailing: Switch(
+                          value: smsEnabled,
+                          onChanged: (val) async {
+                            if (val) {
+                              // Navigate to permission screen if not yet granted
+                              final permissionAsked = settingsBox.get('smsPermissionAsked', defaultValue: false) as bool;
+                              if (!permissionAsked) {
+                                if (context.mounted) {
+                                  context.push('/sms-permission');
+                                }
+                                return;
+                              }
+                              await settingsBox.put('smsEnabled', true);
+                              // Scan immediately
+                              ref.read(smsImportNotifierProvider.notifier).scanSms();
+                            } else {
+                              await settingsBox.put('smsEnabled', false);
+                              // Clear pending
+                              final pendingBox = Hive.box<PendingTransaction>('pendingTransactionsBox');
+                              await pendingBox.clear();
+                              ref.invalidate(smsImportNotifierProvider);
+                            }
+                            setState(() {});
+                          },
+                          activeColor: theme.secondary,
+                        ),
+                      );
+                    },
+                  ),
+                  Divider(height: 1, color: theme.onSurfaceVariant.withValues(alpha: 0.1)),
+                  ListTile(
+                    leading: Icon(Icons.account_balance, color: theme.onSurfaceVariant),
+                    title: Text('Supported banks', style: TextStyle(fontWeight: FontWeight.w500, color: theme.onBackground)),
+                    subtitle: Text(
+                      'HDFC, SBI, ICICI, Axis, Kotak and 10+ more',
+                      style: TextStyle(color: theme.onSurfaceVariant, fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 32),
 

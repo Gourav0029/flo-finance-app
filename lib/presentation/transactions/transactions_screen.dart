@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../application/transactions_list_notifier.dart';
+import '../../application/sms_import_notifier.dart';
 import 'widgets/transaction_icon.dart';
 import 'widgets/add_transaction_bottom_sheet.dart';
 
@@ -43,6 +45,44 @@ class TransactionsScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
+          // SMS Pending Transactions Banner
+          Consumer(
+            builder: (context, ref, _) {
+              final pending = ref.watch(smsImportNotifierProvider);
+              if (pending.isEmpty) return const SizedBox.shrink();
+              return GestureDetector(
+                onTap: () => context.push('/pending-transactions'),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainer,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border(
+                      left: BorderSide(color: const Color(0xFF64F9BC), width: 3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.message, color: Color(0xFF64F9BC), size: 22),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          '${pending.length} transaction${pending.length == 1 ? '' : 's'} detected from SMS',
+                          style: TextStyle(
+                            color: colorScheme.onSurface,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.onSurfaceVariant),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
               child: TextField(

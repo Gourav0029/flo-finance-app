@@ -6,12 +6,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'domain/models/transaction_model.dart';
 import 'domain/models/user_profile_model.dart';
 import 'domain/models/challenge_model.dart';
+import 'domain/models/pending_transaction_model.dart';
 import 'domain/repositories/transaction_repository.dart';
 import 'infrastructure/hive_transaction_repository.dart';
 import 'core/theme/app_theme.dart';
 import 'core/security/encryption_service.dart';
 import 'routing/app_router.dart';
 import 'application/theme_notifier.dart';
+import 'application/sms_import_notifier.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +23,7 @@ void main() async {
   Hive.registerAdapter(TransactionAdapter());
   Hive.registerAdapter(UserProfileAdapter());
   Hive.registerAdapter(ChallengeAdapter());
+  Hive.registerAdapter(PendingTransactionAdapter());
 
   // Get AES-256 encryption cipher (key stored in Android Keystore / iOS Keychain)
   final cipher = await EncryptionService.getEncryptionCipher();
@@ -30,6 +33,7 @@ void main() async {
   await _openEncryptedBox<UserProfile>('userProfileBox', cipher);
   await _openEncryptedBox<dynamic>('settingsBox', cipher);
   await _openEncryptedBox<Challenge>('challengesBox', cipher);
+  await _openEncryptedBox<PendingTransaction>('pendingTransactionsBox', cipher);
 
   runApp(
     ProviderScope(
@@ -71,11 +75,40 @@ Future<Box<T>> _openEncryptedBox<T>(String boxName, HiveCipher cipher) async {
   }
 }
 
-class FloFinanceApp extends ConsumerWidget {
+class FloFinanceApp extends ConsumerStatefulWidget {
   const FloFinanceApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FloFinanceApp> createState() => _FloFinanceAppState();
+}
+
+class _FloFinanceAppState extends ConsumerState<FloFinanceApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      final settingsBox = Hive.box('settingsBox');
+      final smsEnabled = settingsBox.get('smsEnabled', defaultValue: false) as bool;
+      if (smsEnabled) {
+        ref.read(smsImportNotifierProvider.notifier).scanSms();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final goRouter = ref.watch(goRouterProvider);
     final themeMode = ref.watch(themeNotifierProvider);
     return MaterialApp.router(
