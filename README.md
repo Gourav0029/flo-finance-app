@@ -393,4 +393,4 @@ The "Financial Sanctuary" design philosophy was the north star throughout: every
 
 ---
 
-*Built with ❤️ by Gourav Kumar Jha for Zorvyn FinTech*
+*Built with ❤️ by Gourav Kumar Jha*
