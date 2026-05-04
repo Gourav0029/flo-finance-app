@@ -332,7 +332,7 @@ On first launch you will see the onboarding welcome screen. Enter your name, opt
 | Riverpod over BLoC | More concise, testable, and composable for this project size. Providers watch each other — no manual event wiring needed |
 | Proactive AI insights | More valuable than a chatbot — the app surfaces insights from your actual data |
 | Aggregated data to AI | Raw transactions never sent to Gemini — only category totals — preserving transaction-level privacy |
-| INR as currency | App designed for Indian market as per the Zorvyn fintech context |
+| INR as currency | App designed for Indian market as per the fintech context |
 | No-spend streak as core feature | Behavioural psychology shows streaks are the most effective habit-building mechanism in consumer apps |
 | Single initial in avatar | Cleaner than two letters at small sizes. Standard in premium apps like Google, Notion, Linear |
 | flutter_secure_storage for key | Android Keystore is hardware-backed — the encryption key cannot be extracted even with root access |
