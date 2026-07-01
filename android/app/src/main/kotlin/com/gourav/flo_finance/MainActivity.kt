@@ -1,4 +1,4 @@
-package com.zorvyn.flo_finance
+package com.gourav.flo_finance
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

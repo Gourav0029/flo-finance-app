@@ -230,7 +230,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const SizedBox(height: 4),
                   Text('Version 1.0.0', style: TextStyle(color: theme.onSurfaceVariant, fontSize: 13)),
                   const SizedBox(height: 12),
-                  Text('Made with ❤️ for Zorvyn', style: TextStyle(color: theme.onSurfaceVariant, fontSize: 13)),
+                  Text('© 2026 Gourav Kumar', style: TextStyle(color: theme.onSurfaceVariant, fontSize: 13)),
                 ],
               ),
             ),

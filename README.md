@@ -332,7 +332,7 @@ On first launch you will see the onboarding welcome screen. Enter your name, opt
 | Riverpod over BLoC | More concise, testable, and composable for this project size. Providers watch each other — no manual event wiring needed |
 | Proactive AI insights | More valuable than a chatbot — the app surfaces insights from your actual data |
 | Aggregated data to AI | Raw transactions never sent to Gemini — only category totals — preserving transaction-level privacy |
-| INR as currency | App designed for Indian market as per the Zorvyn fintech context |
+| INR as currency | App designed for the Indian market — all amounts formatted in the Indian number system |
 | No-spend streak as core feature | Behavioural psychology shows streaks are the most effective habit-building mechanism in consumer apps |
 | Single initial in avatar | Cleaner than two letters at small sizes. Standard in premium apps like Google, Notion, Linear |
 | flutter_secure_storage for key | Android Keystore is hardware-backed — the encryption key cannot be extracted even with root access |
@@ -387,10 +387,8 @@ On first launch you will see the onboarding welcome screen. Enter your name, opt
 
 ## 🙏 Acknowledgements
 
-This project was built as part of the Zorvyn FinTech internship assignment. The goal was not just to build a working app, but to demonstrate how a thoughtful mobile developer thinks about product experience, architecture, user trust, and security — especially in the sensitive domain of personal finance.
-
 The "Financial Sanctuary" design philosophy was the north star throughout: every screen, every interaction, and every line of code was written with the question — *does this make the user feel more in control of, and more secure about, their money?*
 
 ---
 
-*Built with ❤️ by Gourav Kumar Jha for Zorvyn FinTech*
+*Built with ❤️ by Gourav Kumar*
